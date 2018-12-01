@@ -42,14 +42,16 @@ class Captcha
         // 验证码位数
         'fontttf'  => '',
         // 验证码字体，不设置随机获取
-        'bg'       => [243, 251, 254],
-        // 背景颜色
+        'bg'       => false,
+        // 背景颜色[150,150,150]  false为透明背景
         'reset'    => true,
         // 验证成功后是否重置
+        // 验证码字体颜色
+        'color'     => false
     ];
 
     private $im    = null; // 验证码图片实例
-    private $color = null; // 验证码字体颜色
+    //private $color = null; // 验证码字体颜色
 
     /**
      * 架构方法 设置参数
@@ -142,10 +144,22 @@ class Captcha
         // 建立一幅 $this->imageW x $this->imageH 的图像
         $this->im = imagecreate($this->imageW, $this->imageH);
         // 设置背景
-        imagecolorallocate($this->im, $this->bg[0], $this->bg[1], $this->bg[2]);
+        if (false===$this->bg){
+            //透明
+            $c=imagecolorallocate($this->im, 255, 255, 255);
+            imagecolortransparent($this->im,$c);
+            imagefill($this->im,0,0,$c);
+        }else{
+            imagecolorallocate($this->im, $this->bg[0], $this->bg[1], $this->bg[2]);
+        }
 
-        // 验证码字体随机颜色
-        $this->color = imagecolorallocate($this->im, mt_rand(1, 150), mt_rand(1, 150), mt_rand(1, 150));
+        if(!$this->color){
+            // 验证码字体随机颜色
+            $this->color = imagecolorallocate($this->im, mt_rand(1, 150), mt_rand(1, 150), mt_rand(1, 150));
+        }else{
+            $this->color = imagecolorallocate($this->im, $this->color[0], $this->color[1],$this->color[2]);
+        }
+
         // 验证码使用随机字体
         $ttfPath = __DIR__ . '/../assets/' . ($this->useZh ? 'zhttfs' : 'ttfs') . '/';
 
@@ -188,7 +202,8 @@ class Captcha
             for ($i = 0; $i < $this->length; $i++) {
                 $code[$i] = $this->codeSet[mt_rand(0, strlen($this->codeSet) - 1)];
                 $codeNX += mt_rand($this->fontSize * 1.2, $this->fontSize * 1.6);
-                imagettftext($this->im, $this->fontSize, mt_rand(-40, 40), $codeNX, $this->fontSize * 1.6, $this->color, $this->fontttf, $code[$i]);
+                //默认x坐标为 * 1.6
+                imagettftext($this->im, $this->fontSize, mt_rand(-40, 40), $codeNX, $this->fontSize * 2.0, $this->color, $this->fontttf, $code[$i]);
             }
         }
 
