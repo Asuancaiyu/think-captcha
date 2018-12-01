@@ -46,8 +46,8 @@ class Captcha
         // 背景颜色[150,150,150]  false为透明背景
         'reset'    => true,
         // 验证成功后是否重置
-        // 验证码字体颜色
         'color'     => false
+        // 验证码字体颜色
     ];
 
     private $im    = null; // 验证码图片实例
